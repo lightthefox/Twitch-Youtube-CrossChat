@@ -1,0 +1,86 @@
+<html>
+  <div id="chat"></div>
+  <span id="modify">
+    <h2>Youtube Icon URL:
+    </h2><input type="text" id="yt_icon_url" class="specialIn" value="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/640px-YouTube_full-color_icon_%282017%29.svg.png"></input>
+    <h2>Twitch Icon URL:
+    </h2><input type="text" id="tw_icon_url" class="specialIn" value="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Twitch_icon_2012.svg/423px-Twitch_icon_2012.svg.png"></input>
+    
+    <h3>CSS:
+    </h3><textarea id="custom_css" class="specialIn" rows=20 cols=40></textarea>
+  </span>
+</html>
+
+<script>
+  //eruda
+  /*var script = document.createElement('script'); script.src="https://cdn.jsdelivr.net/npm/eruda"; document.body.append(script); script.onload = function () { eruda.init(); };*/
+  
+  let server = "127.0.0.1:2545"
+  async function get_chat(){
+    const req = await fetch("/getchat");
+    const chatMessages = await req.text();
+    //console.log(req.text)
+    console.log(req);
+    //console.log(out);
+    var format = "";
+    
+    chatMessages.split("\n").forEach(function (item) {
+      if (item != ""){
+        let ytIco = document.getElementById("yt_icon_url").value;
+        let twIco = document.getElementById("tw_icon_url").value;
+        let it = '<div class="';
+        if(item.startsWith("YT:")){
+          it += "youtube";
+        }
+        else{
+          it +="twitch";
+        }
+        it +=' message"><div class="';
+        if(item.startsWith("YT:")){
+          it += "nameYt"
+        }
+        else{
+          it += "nameTw"
+        }
+        it +='"><img src="';
+        if(item.startsWith("YT:")){
+          it += yt_icon_url.value;
+        }
+        else{
+          it += tw_icon_url.value;
+        }
+        let message = item.split(",").slice(2, item.split(",").length).toString();
+        if(item.startsWith("TW:")){
+          message = message.slice(1);
+        }
+        it += '" alt=O class="msgico">'
+        it += item.split(",")[1]+'</img></div><br/>'+message+'</div><br/>';
+        format +=it;
+      }
+    });
+    //document.getElementById("chat").innerHTML = chatMessages.replaceAll("\n", "<br/>");
+    document.getElementById("chat").innerHTML = format;
+    document.getElementById("custom").innerHTML = document.getElementById("custom_css").value;
+  }
+  onload = async function(){
+    document.getElementById("custom_css").value = "#chat {\n background-color:rgb(110,110,160);\n  width:400px;\n  height:100%;\n  color:white;\n  overflow:hidden;\n}\n#modify{\n  margin-left:20px;\n  background-color:rgb(150,120,100);\n  width:400px;\n  height:100%;\n  color:white;\n}\n.twitch{\n  border: 6px solid rgb(100,65,165);\n border-top-style:solid;\n  border-top-width:26px;\n}\n.youtube{\n  border: 6px solid rgb(200,80,80);\n  border-top-style:solid;\n  border-top-width:26px;\n}\n.message{\n  color:black; background-color:white; \n  border-radius: 8px 8px 8px 8px;\n}\n.msgico{\n  filter:brightness(70%); width: 20px;\n}\n.nameTw{\n  background-color: rgb(100,65,165);\n}\n.nameYt{\n  background-color: rgb(200,80,80);\n}";
+    document.getElementById("custom").innerHTML = document.getElementById("custom_css").value;
+    var interv = setInterval("get_chat()", 5000);
+  }
+  get_chat();
+</script>
+
+<style>
+  .specialIn{
+    width:100%;
+    border-radius:4px 4px 4px 4px;
+  }
+  html, body{
+    margin:0px;
+    padding:0px;
+    background-color:black;
+    display:inline-flex;
+  }
+</style>
+
+<style id="custom"></style>
